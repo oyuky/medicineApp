@@ -1,0 +1,42 @@
+<ion-view view-title="Agregar medicamento">
+  <ion-content>
+    <form name="medicineForm">
+      <label class="item item-input">
+        <span class="input-label">Medicamento</span>
+        <input type="text" ng-model="formData.txtMedicamentoNombre" name="txtMedicamentoNombre" required>
+      </label>
+      <label class="item item-input">
+        <span class="input-label">Cantidad</span>
+        <input type="number" ng-model="formData.txtCantidad" name="txtCantidad" required>
+      </label>
+      <label class="item item-input item-select item">
+        <div class="input-label">
+          Unidad de medida
+        </div>
+        <select ng-model="formData.ddlUnidadMedida" name="ddlUnidadMedida" required>
+          <option value="0" selected="true">Tableta</option>
+          <option value="1">ml</option>
+          <option value="2">mg</option>
+          <option value="3">Other</option>
+        </select>
+      </label>
+      <label class="item item-input">
+        <span class="input-label">No. días</span>
+        <input type="number" ng-model="formData.txtDias" name="txtDias" required>
+      </label>
+      <label class="item item-input">
+        <span class="input-label">Repetir cada</span>
+        <input type="number" ng-model="formData.txtRepetirHoras" name="txtRepetirHoras">
+        <span class="input-label">hrs.</span>
+      </label>
+      <label class="item item-input">
+        <span class="input-label">Observaciones</span>
+        <input type="text" ng-model="formData.txtObservaciones" name="txtObservaciones">
+      </label>
+      <button class="button button-balanced button-full" ng-click="guardar(formData)">
+        Guardar
+      </button>
+      {{statusMessage}}
+    </form>
+  </ion-content>
+</ion-view>

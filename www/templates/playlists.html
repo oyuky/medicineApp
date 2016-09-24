@@ -1,0 +1,25 @@
+<ion-view view-title="Playlists">
+  <ion-content>
+    <label class="item item-input" href="#/app/playlists/playlist">
+      <i class="icon ion-plus-round"></i>&nbsp;&nbsp;
+      <span class="input-label">Agregar alerta</span>
+    </label>
+
+    <ion-list>
+      <ion-item ng-repeat="playlist in playlists" href="#/app/playlists/{{playlist.id}}">
+        {{playlist.title}}
+      </ion-item>
+      <ul class="list">
+        <li class="item item-toggle">
+          Toggle Light
+          <label class="toggle toggle-balance">
+            <input type="checkbox">
+            <div class="track">
+              <div class="handle"></div>
+            </div>
+          </label>
+        </li>
+      </ul>
+    </ion-list>
+  </ion-content>
+</ion-view>

@@ -1,0 +1,25 @@
+<ion-view view-title="Alertas de medicamentos">
+  <ion-content>
+    <ion-list>
+      <ion-item  on-touch="deleteDB()">
+        <div class="item-icon-left">
+          <i class="icon ion-plus-round"></i>Eliminar DB
+        </div>
+      </ion-item>
+     <!-- <ion-item  on-touch="crearDB()">
+        <div class="item-icon-left">
+          <i class="icon ion-plus-round"></i>Crear DB
+        </div>
+      </ion-item>-->
+      <ion-item  href="#/app/medicineadd">
+        <div class="item-icon-left">
+          <i class="icon ion-plus-round"></i>Agregar alerta
+        </div>
+      </ion-item>
+      <ion-toggle ng-repeat="medicine in medicinelist" toggle-class="toggle-balance">{{medicine.medicamento_nombre}}</ion-toggle>
+    </ion-list>
+    {{messageinfo}}
+
+  </ion-content>
+</ion-view>
+
