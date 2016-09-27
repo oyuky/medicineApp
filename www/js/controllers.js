@@ -1,6 +1,6 @@
 var error=null;
 angular.module('starter.controllers', ['ionic', 'ngCordova'])
-  .controller('AppCtrl', function($scope, $ionicModal, $timeout, $cordovaSQLite) {
+  .controller('AppCtrl', function($scope, $ionicModal,$ionicPlatform, $timeout, $cordovaSQLite) {
 
     // With the new view caching in Ionic, Controllers are only called
     // when they are recreated or on app start, instead of every page change.
@@ -9,7 +9,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
     //$scope.$on('$ionicView.enter', function(e) {
     //});
 
-    $scope.messageinfo += db;
+    //$scope.messageinfo += db;
     // Agregar medicina
     $scope.formData = {};
     // Form data for the login modal
@@ -82,7 +82,8 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
           formData.txtDias, formData.txtRepetirHoras, formData.txtObservaciones
         ]).then(function (res) {
           console.log("INSERT ID -> " + res.insertId);
-          $scope.getmedicinelist();
+          $scope.getMedicineList();
+          $scope.statusMessage = "ID guardado: " + res.insertId;
         }, function (error) {
           $scope.statusMessage = "Error al guardar: " + error.message;
         })
@@ -91,27 +92,27 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
       }
     };
 
-    $scope.getmedicinelist = function () {
-      try {
+    $ionicPlatform.ready(function() {
+      $scope.getMedicineList();
+    });
 
+   $scope.getMedicineList= function(){
+      try {
+        $scope.medicinelist = [];
         var query = "SELECT id, medicamento_nombre FROM Medicamento ";
-        $cordovaSQLite.execute(db, query).then(function (res) {
-          $scope.medicinelist = [];
+        $cordovaSQLite.execute(db, query,[]).then(function (res) {
           var countRes = res.rows.length;
           if (countRes > 0) {
             for (var i = 0 ; i < countRes; i++) {
-              $scope.messageinfo +=" iteracion ->"+i;
               $scope.medicinelist.push(res.rows.item(i));
-              $scope.messageinfo +=" id-> "+res.rows.item(i).id;
-              $scope.messageinfo +=" nombre-> "+res.rows.item(i).medicamento_nombre;
             }
 
           }
           else {
-            $scope.messageinfo += "No results found" + " - ";
+            $scope.messageinfo = "No hay alertas programadas. ";
           }
         }, function (err) {
-          $scope.messageinfo += err + " - ";
+          $scope.messageinfo += "Error -> "+err;
         });
       }
       catch (error) {
@@ -119,14 +120,11 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
       }
     };
 
-    document.addEventListener("deviceready", onDeviceReady, false);
-    function onDeviceReady() {
-      $scope.medicinelist =  getmedicinelist();
-    }
+
 
     $scope.holamundo = function () {
       $scope.messageinfo += "--hola mundo";
     };
 
-    $scope.holamundo();
+    //$scope.holamundo();
   });

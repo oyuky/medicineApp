@@ -7,8 +7,8 @@
 
 var db=null;
 var error=null;
-angular.module('starter', ['ngCordova','ionic','starter.controllers'])
-.run(function($cordovaSQLite, $ionicPlatform) {
+angular.module('starter', ['ionic','starter.controllers','ngCordova'])
+.run(function($ionicPlatform, $cordovaSQLite) {
   $ionicPlatform.ready(function () {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -22,13 +22,16 @@ angular.module('starter', ['ngCordova','ionic','starter.controllers'])
       StatusBar.styleDefault();
     }
     try {
-      if(window.cordova) {
+      //, iosDatabaseLocation: 'Library'
+
+      if (window.cordova) {
         // App syntax
         db = $cordovaSQLite.openDB({name: 'medicineApp.db', location: 'default'});
       } else {
         // Ionic serve syntax
         db = window.openDatabase("medicineApp.db", "1.0", "MedicineApp", -1);
       }
+      //$cordovaSQLite.execute(db, 'DROP TABLE IF EXISTS Medicamento');
       var query = "CREATE TABLE IF NOT EXISTS Medicamento " +
         "(id INTEGER PRIMARY KEY, " +
         "medicamento_nombre TEXT, " +
@@ -37,7 +40,9 @@ angular.module('starter', ['ngCordova','ionic','starter.controllers'])
         "numero_dias NUMBER, " +
         "repetir_horas NUMBER, " +
         "observaciones TEXT)";
+
       $cordovaSQLite.execute(db, query);
+
     }
     catch (err) {
       error = err;
