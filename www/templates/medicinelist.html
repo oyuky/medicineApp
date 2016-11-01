@@ -1,4 +1,4 @@
-<ion-view view-title="Alertas de medicamentos">
+<ion-view view-title="Recordar Píldoras">
   <ion-content>
     <ion-list>
       <!--  <ion-item  on-touch="deleteDB()">
@@ -16,7 +16,23 @@
           <i class="icon ion-plus-round"></i>Agregar alerta
         </div>
       </ion-item>
-      <ion-toggle ng-repeat="medicine in medicinelist" toggle-class="toggle-balance">{{medicine.medicamento_nombre}}</ion-toggle>
+        <ion-item ng-repeat="medicine in medicinelist track by $index" class="item-toggle-option item-remove-animate">
+          {{medicine.medicamento_nombre}}
+          <label class="toggle toggle-balanced">
+            <input type="checkbox" ng-model="medicine.checked" ng-click="createEvents($index,medicine.id)">
+            <div class="track" >
+              <div class="handle" ></div>
+            </div>
+          </label>
+          <ion-option-button class="button-assertive" ng-click="deleteMedicine($index,medicine.id)">
+            Eliminar
+          </ion-option-button>
+        </ion-item>
+      <!--<ion-toggle class="item-icon-right" ui-sref="medicine({id:medicine.id})" ng-repeat="medicine in medicinelist track by $index" toggle-class="toggle-balance">
+        <ion-delete-button class="ion-minus-circled" ng-click="deleteMedicine($index,medicine.id)"></ion-delete-button>
+        {{medicine.medicamento_nombre}}
+      </ion-toggle>
+      <ion-toggle ng-repeat="medicine in medicinelist" toggle-class="toggle-balance">{{medicine.medicamento_nombre}}</ion-toggle>-->
     </ion-list>
     {{messageinfo}}
   </ion-content>

@@ -1,0 +1,18 @@
+<ion-view view-title="Recordar Píldoras">
+  <ion-content>
+    <form name="configurationForm">
+      <label class="item item-input">
+        <span class="input-label">Recordatorio 1</span>
+        <input type="number" ng-model="configForm.alarma1" name="txtRecordatorio1" required>
+      </label>
+      <label class="item item-input">
+        <span class="input-label">Recordatorio 2</span>
+        <input type="number" ng-model="configForm.alarma2" name="txtRecordatorio2" required>
+      </label>
+      <button class="button button-balanced button-full" ng-click="updateConfiguration()">
+        Guardar
+      </button>
+      {{statusMessage}}
+    </form>
+  </ion-content>
+</ion-view>

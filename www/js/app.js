@@ -7,8 +7,8 @@
 
 var db=null;
 var error=null;
-angular.module('starter', ['ionic','starter.controllers','ngCordova'])
-.run(function($ionicPlatform, $cordovaSQLite) {
+angular.module('starter', ['ionic','ConfigurationApp','MedicineApp','ngCordova'])
+.run(function($ionicPlatform, $cordovaSQLite, $cordovaCalendar) {
   $ionicPlatform.ready(function () {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -40,9 +40,29 @@ angular.module('starter', ['ionic','starter.controllers','ngCordova'])
         "numero_dias NUMBER, " +
         "repetir_horas NUMBER, " +
         "observaciones TEXT)";
-
       $cordovaSQLite.execute(db, query);
 
+      /*
+      $cordovaCalendar.deleteCalendar('Medicamentos').then(function (result) {
+        console.log("yey");
+        // success
+      }, function (err) {
+        console.log("no yey");
+        // error
+      });
+
+      $cordovaCalendar.createCalendar({
+        calendarName: 'Medicamentos',
+        calendarColor: '#FF0000'
+      }).then(function (result) {
+        console.log("yey");
+        // success
+      }, function (err) {
+        console.log("no yey");
+        // error
+      });
+
+*/
     }
     catch (err) {
       error = err;
@@ -52,28 +72,18 @@ angular.module('starter', ['ionic','starter.controllers','ngCordova'])
 
 .config(function($stateProvider, $urlRouterProvider) {
   $stateProvider
-
     .state('app', {
       url: '/app',
       abstract: true,
       templateUrl: 'templates/menu.html',
-      controller: 'AppCtrl'
+      controller: 'MedicineCtrl'
     })
-
-    .state('app.search', {
-      url: '/search',
+    .state('app.configuration', {
+      url: '/configuration',
       views: {
         'menuContent': {
-          templateUrl: 'templates/search.html'
-        }
-      }
-    })
-
-    .state('app.browse', {
-      url: '/browse',
-      views: {
-        'menuContent': {
-          templateUrl: 'templates/browse.html'
+          templateUrl: 'templates/configuration.html',
+          controller: 'ConfigurationCtrl'
         }
       }
     })
@@ -82,7 +92,7 @@ angular.module('starter', ['ionic','starter.controllers','ngCordova'])
       views: {
         'menuContent': {
           templateUrl: 'templates/medicinelist.html',
-          controller: 'AppCtrl'
+          controller: 'MedicineCtrl'
         }
       }
     })
@@ -91,19 +101,39 @@ angular.module('starter', ['ionic','starter.controllers','ngCordova'])
       views: {
         'menuContent': {
           templateUrl: 'templates/medicineadd.html',
-          controller: 'AppCtrl'
-        }
-      }
-    })
-    /*.state('app.single', {
-      url: '/medicinelist/:medicinelistId',
-      views: {
-        'menuContent': {
-          templateUrl: 'templates/medicinelist.html',
           controller: 'MedicineCtrl'
         }
       }
-    });*/
+    });
+  /*
+   .state('app.search', {
+   url: '/search',
+   views: {
+   'menuContent': {
+   templateUrl: 'templates/search.html'
+   }
+   }
+   })
+
+   .state('app.browse', {
+   url: '/browse',
+   views: {
+   'menuContent': {
+   templateUrl: 'templates/browse.html'
+   }
+   }
+   })
+   .state('medicinelist', {
+   url: '/',
+   templateUrl: 'templates/medicinelist.html',
+   controller: 'MedicineCtrl'
+   })
+   .state('medicineadd', {
+   url: '/medicineadd',
+   templateUrl: 'templates/medicineadd.html',
+   controller: 'MedicineCtrl'
+   })
+   */
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/app/medicinelist');
 });

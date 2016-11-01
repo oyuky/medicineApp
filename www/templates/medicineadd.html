@@ -6,7 +6,7 @@
         <input type="text" ng-model="formData.txtMedicamentoNombre" name="txtMedicamentoNombre" required>
       </label>
       <label class="item item-input">
-        <span class="input-label">Cantidad</span>
+        <span class="input-label">Dosis</span>
         <input type="number" ng-model="formData.txtCantidad" name="txtCantidad" required>
       </label>
       <label class="item item-input item-select item">
@@ -33,7 +33,7 @@
         <span class="input-label">Observaciones</span>
         <input type="text" ng-model="formData.txtObservaciones" name="txtObservaciones">
       </label>
-      <button class="button button-balanced button-full" ng-click="guardar(formData)">
+      <button class="button button-balanced button-full" ng-click="addNewMedicine()">
         Guardar
       </button>
       {{statusMessage}}
