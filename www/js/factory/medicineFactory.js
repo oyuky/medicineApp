@@ -2,8 +2,8 @@
  * Created by Oyuky on 22/09/2016.
  */
 var medicinesListModule = angular.module('MedicineApp');
-medicinesListModule.factory('MedicineFactory',['$cordovaSQLite','$ionicPlatform','$q', '$cordovaCalendar','SettingsFactory',
-  function($cordovaSQLite,$ionicPlatform,$q, $cordovaCalendar,SettingsFactory) {
+medicinesListModule.factory('MedicineFactory',['EventFactory','$cordovaSQLite','$ionicPlatform','$q', '$cordovaCalendar',
+  function(EventFactory, $cordovaSQLite,$ionicPlatform,$q, $cordovaCalendar) {
     var db;
     var medicineList;
     var medicineTemp;
@@ -22,6 +22,8 @@ medicinesListModule.factory('MedicineFactory',['$cordovaSQLite','$ionicPlatform'
       addNewMedicine: addNewMedicine,
       deleteMedicine: deleteMedicine,
       createEvents: createEvents,
+      deleteEvents:deleteEvents,
+      updateMedicine: updateMedicine,
       getMedicine: getMedicine
     }
 
@@ -47,6 +49,7 @@ medicinesListModule.factory('MedicineFactory',['$cordovaSQLite','$ionicPlatform'
             "unidad_medida TEXT, " +
             "numero_dias NUMBER, " +
             "repetir_horas NUMBER, " +
+            "encendido NUMBER, "+
             "observaciones TEXT)";
 
           runQuery(query, [], function (res) {
@@ -62,7 +65,7 @@ medicinesListModule.factory('MedicineFactory',['$cordovaSQLite','$ionicPlatform'
 
     function getAllMedicines() {
       var deferred = $q.defer();
-      var query = "SELECT id, medicamento_nombre FROM Medicamento ";
+      var query = "SELECT id, medicamento_nombre, encendido FROM Medicamento ";
       runQuery(query, [], function (response) {
         //Success Callback
         console.log(response);
@@ -79,9 +82,26 @@ medicinesListModule.factory('MedicineFactory',['$cordovaSQLite','$ionicPlatform'
     function addNewMedicine(formData) {
       console.log('adding new medicine :' + formData.txtMedicamentoNombre);
       var deferred = $q.defer();
-      var query = "INSERT INTO Medicamento (medicamento_nombre, cantidad, unidad_medida, numero_dias, repetir_horas, observaciones ) VALUES (?,?,?,?,?,?)";
+      var query = "INSERT INTO Medicamento (medicamento_nombre, cantidad, unidad_medida, numero_dias, repetir_horas, encendido, observaciones ) VALUES (?,?,?,?,?,?,?)";
       runQuery(query, [formData.txtMedicamentoNombre, formData.txtCantidad, formData.ddlUnidadMedida,
-        formData.txtDias, formData.txtRepetirHoras, formData.txtObservaciones], function (response) {
+        formData.txtDias, formData.txtRepetirHoras, 0, formData.txtObservaciones], function (response) {
+        //Success Callback
+        console.log(response);
+        deferred.resolve(response);
+      }, function (error) {
+        //Error Callback
+        console.log(error);
+        deferred.reject(error);
+      });
+
+      return deferred.promise;
+    }
+
+    function updateMedicine(id,encendido) {
+      console.log('update :' + id+' valor '+ encendido);
+      var deferred = $q.defer();
+      var query = "UPDATE Medicamento SET encendido=? WHERE id=?";
+      runQuery(query, [encendido,id], function (response) {
         //Success Callback
         console.log(response);
         deferred.resolve(response);
@@ -149,88 +169,79 @@ medicinesListModule.factory('MedicineFactory',['$cordovaSQLite','$ionicPlatform'
         });
       }.bind(this));
     }
-
-    function createEvents(id) {
+    function deleteEvents(id) {
       try {
         var medicineAlert;
         getMedicine(id).then(function (res) {
-          var countRes = res.rows.length;
-          if (countRes > 0) {
-            medicineAlert = res.rows.item(0);
-            var horas_disponibles = medicineTemp.numero_dias * 24;
-            console.log("dias no. " + medicineTemp.numero_dias + " cada " + medicineTemp.repetir_horas + " total de horas.." + horas_disponibles);
-            var repeticiones = horas_disponibles / medicineTemp.repetir_horas;
-            var primeraDosis, siguienteDosis;
-            var descripcion = "";
-            for (var i = 1; i <= repeticiones; i++) {
-              if (i == 1) {
-                temp = new Date();
-                primeraDosis = new Date();
-                primeraDosis.setMinutes(temp.getMinutes() + 3);
-                siguienteDosis = new Date(primeraDosis);
-                descripcion = "Dosis no. " + i + " tomar " + medicineTemp.cantidad + " " + medicineTemp.unidad_medida;
-                evento.descripcion = descripcion;
-                evento.inicio = siguienteDosis;
-                evento.fin = siguienteDosis;
-                evento.nombre = medicineTemp.medicamento_nombre + '_MED' + medicineTemp.id;
-                evento.recordatorio1 = SettingsFactory.getAlarma1();
-                evento.recordatorio2 = SettingsFactory.getAlarma2();
-                addCalendar(evento);
-                console.log("Dosis no. " + i + " tomar a las " + siguienteDosis);
-              } else {
-                siguienteDosis.setHours(primeraDosis.getHours() + medicineTemp.repetir_horas);
-                descripcion = "Dosis no. " + i + " tomar " + medicineTemp.cantidad + " " + medicineTemp.unidad_medida;
-                evento.descripcion = descripcion;
-                evento.inicio = siguienteDosis;
-                evento.fin = siguienteDosis;
-                evento.recordatorio1 = SettingsFactory.getAlarma1();
-                evento.recordatorio2 = SettingsFactory.getAlarma2();
-                evento.nombre = medicineTemp.medicamento_nombre + '_MED' + medicineTemp.id;
-                addCalendar(evento);
-                primeraDosis = siguienteDosis;
-              }
-            }
-          }
-          else {
-            $scope.messageinfo = "Error al consultar. ";
-          }
+          EventFactory.deleteEvent();
         }, function (err) {
           $scope.messageinfo += "Error -> " + err;
         });
       }
-
       catch
         (error) {
         $scope.messageinfo += "error 2 ->" + error + " - ";
       }
-      event.inicio=new Date();
-      //event.descripcion= 'Prescripción ' + medicineAlert.cantidad + ' ' + medicineAlert.unidad_medida + ' por ' + medicineAlert.numero_dias + ' día(s), cada ' + medicineAlert.repetir_horas + ' hrs.';
-      console.log(event);
+    }
+    function createEvents(id) {
+      try {
+        var medicineAlert;
+        getMedicine(id).then(function (res) {
+          EventFactory.createEvents(res.rows.item(0));
+          /*
+           var countRes = res.rows.length;
+           if (countRes > 0) {
+           medicineAlert = res.rows.item(0);
+           var horas_disponibles = medicineTemp.numero_dias * 24;
+           console.log("dias no. " + medicineTemp.numero_dias + " cada " + medicineTemp.repetir_horas + " total de horas.." + horas_disponibles);
+           var repeticiones = horas_disponibles / medicineTemp.repetir_horas;
+           var primeraDosis, siguienteDosis;
+           var descripcion = "";
+           for (var i = 1; i <= repeticiones; i++) {
+           if (i == 1) {
+           temp = new Date();
+           primeraDosis = new Date();
+           primeraDosis.setMinutes(temp.getMinutes() + 3);
+           siguienteDosis = new Date(primeraDosis);
+           descripcion = "Dosis no. " + i + " tomar " + medicineTemp.cantidad + " " + medicineTemp.unidad_medida;
+           evento.descripcion = descripcion;
+           evento.inicio = siguienteDosis;
+           evento.fin = siguienteDosis;
+           evento.nombre = medicineTemp.medicamento_nombre + '_MED' + medicineTemp.id;
+           evento.recordatorio1 = SettingsFactory.getAlarma1();
+           evento.recordatorio2 = SettingsFactory.getAlarma2();
+           addCalendar(evento);
+           console.log("Dosis no. " + i + " tomar a las " + siguienteDosis);
+           } else {
+           siguienteDosis.setHours(primeraDosis.getHours() + medicineTemp.repetir_horas);
+           descripcion = "Dosis no. " + i + " tomar " + medicineTemp.cantidad + " " + medicineTemp.unidad_medida;
+           evento.descripcion = descripcion;
+           evento.inicio = siguienteDosis;
+           evento.fin = siguienteDosis;
+           evento.recordatorio1 = SettingsFactory.getAlarma1();
+           evento.recordatorio2 = SettingsFactory.getAlarma2();
+           evento.nombre = medicineTemp.medicamento_nombre + '_MED' + medicineTemp.id;
+           addCalendar(evento);
+           primeraDosis = siguienteDosis;
+           }
+           }
+           updateMedicine(medicineTemp.encendido,medicineTemp.ID);
+           }
+           else {
+           $scope.messageinfo = "Error al consultar. ";
+           }*/
+        }, function (err) {
+          $scope.messageinfo += "Error -> " + err;
+        });
+      }
+      catch
+        (error) {
+        $scope.messageinfo += "error 2 ->" + error + " - ";
+      }
+      //evento.descripcion= 'Prescripción ' + medicineAlert.cantidad + ' ' + medicineAlert.unidad_medida + ' por ' + medicineAlert.numero_dias + ' día(s), cada ' + medicineAlert.repetir_horas + ' hrs.';
     }
 
-    function addCalendar(temp) {
-      var deferred = $q.defer();
-
-      $cordovaCalendar.createEventWithOptions({
-        title: temp.nombre,
-        notes: temp.descripcion,
-        startDate: temp.inicio,
-        firstReminderMinutes:temp.recordatorio1,
-        secondReminderMinutes:temp.recordatorio2,
-        endDate: temp.fin,
-      }).then(function (result) {
-        console.log('success');
-        console.dir(result);
-        deferred.resolve(1);
-      }, function (err) {
-        console.log('error');
-        console.dir(err);
-        deferred.resolve(0);
-      });
-
-      return deferred.promise;
-    }
-/*
+    /*
     function getConfig(){
       var deferred = $q.defer();
       var query = "SELECT * FROM Configuracion ";

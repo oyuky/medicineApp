@@ -39,8 +39,10 @@ angular.module('starter', ['ionic','ConfigurationApp','MedicineApp','ngCordova']
         "unidad_medida TEXT, " +
         "numero_dias NUMBER, " +
         "repetir_horas NUMBER, " +
+        "encendido NUMBER, "+
         "observaciones TEXT)";
       $cordovaSQLite.execute(db, query);
+      console.log('se crea db');
 
       /*
       $cordovaCalendar.deleteCalendar('Medicamentos').then(function (result) {

@@ -10,6 +10,25 @@ medicinesListModule.controller('MedicineCtrl',['$scope','$cordovaSQLite', '$ioni
       initData();
       initMethods();
 
+      $scope.checkItem = function (id) {
+        var checked = false;
+        for(var i=0; i<= medicinelist.length; i++) {
+          if(id == medicinelist[i]) {
+            checked = true;
+          }
+        }
+        return checked;
+      };
+
+      $scope.deleteDB = function () {
+        try {
+          $cordovaSQLite.execute(db, "DROP TABLE Medicamento");
+          $cordovaSQLite.deleteDB("medicineApp.db");
+          $scope.messageinfo = db + " - ";
+        } catch (error) {
+          $scope.messageinfo = error + " - ";
+        }
+      };
 
       function initData() {
         try {
@@ -41,11 +60,24 @@ medicinesListModule.controller('MedicineCtrl',['$scope','$cordovaSQLite', '$ioni
         };
       }
 
-      function createEvents(index, id) {
-        MedicineFactory.medicinelist=$scope.medicinelist;
-        MedicineFactory.createEvents(id);
-        alert("toggle click");
-        $event.stopImmediatePropagation();
+      function createEvents(index, id, encendido) {
+        if (encendido==0) {
+          console.log("encender..."+encendido);
+          MedicineFactory.createEvents(id);
+          MedicineFactory.updateMedicine(id, 1);
+          loadMedicineList();
+          alert("encender eventos");
+          event.stopImmediatePropagation();
+        }
+        else
+        {
+
+          console.log("apagar..."+encendido);
+          MedicineFactory.deleteEvents(id);
+          MedicineFactory.updateMedicine(id, 0);
+          loadMedicineList();
+          alert("apagar eventos");
+        }
       }
 
       function loadMedicineList() {
@@ -56,10 +88,10 @@ medicinesListModule.controller('MedicineCtrl',['$scope','$cordovaSQLite', '$ioni
             var countRes = res.rows.length;
             if (countRes > 0) {
               for (var i = 0; i < countRes; i++) {
-                $scope.medicinelist.push({id:res.rows.item(i).id,medicamento_nombre:res.rows.item(i).medicamento_nombre});
+                $scope.medicinelist.push({id:res.rows.item(i).id,medicamento_nombre:res.rows.item(i).medicamento_nombre, encendido:res.rows.item(i).encendido});
+                console.log("encendido ---- ->" + res.rows.item(i).encendido + " - ");
                 //$scope.medicinelist.push(res.rows.item(i));
               }
-
             }
             else {
               $scope.messageinfo = "No hay alertas programadas. ";
